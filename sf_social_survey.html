@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF Social Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand:#faf6ef;--sand-mid:#f0e9dc;--sand-dark:#ddd0bc;
+    --clay:#c4613a;--clay-l:#d97d58;--clay-p:rgba(196,97,58,0.08);
+    --bark:#2b1f14;--bark-m:#4a3828;--bark-l:#8c7260;
+    --bdr:rgba(43,31,20,0.1);--card:rgba(255,255,255,0.7);
+    --blue:#2d5fa6;--blue-l:#4a7fc1;--blue-p:rgba(45,95,166,0.08);
+    --err:#c0392b;--err-p:rgba(192,57,43,0.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--sand);color:var(--bark);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh}
+  body::before{content:'';position:fixed;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(225,168,80,.15) 0%,transparent 65%);pointer-events:none;z-index:0;transition:background .5s}
+  body.p2::before{background:radial-gradient(circle,rgba(45,95,166,.09) 0%,transparent 65%)}
+  body.p2{background:#f4f6f9}
+  .wrap{max-width:620px;margin:0 auto;padding:52px 24px 100px;position:relative;z-index:1}
+  .hdr{margin-bottom:44px;animation:rise .6s cubic-bezier(.22,.68,0,1.2) both}
+  .pbadge{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);margin-bottom:20px;transition:color .4s}
+  .pbadge .bd{width:7px;height:7px;border-radius:50%;background:var(--clay);transition:background .4s}
+  body.p2 .pbadge{color:var(--blue)} body.p2 .pbadge .bd{background:var(--blue)}
+  h1{font-family:'Fraunces',serif;font-size:clamp(26px,5.5vw,42px);font-weight:600;line-height:1.15;color:var(--bark);margin-bottom:16px}
+  h1 em{font-style:italic;font-weight:400;color:var(--clay);transition:color .4s}
+  body.p2 h1 em{color:var(--blue)}
+  .sub{font-size:15px;color:var(--bark-l);line-height:1.75;max-width:460px}
+  .tbadge{display:inline-flex;align-items:center;gap:6px;margin-top:18px;background:var(--sand-mid);border:1px solid var(--sand-dark);border-radius:100px;font-size:12px;font-weight:500;color:var(--bark-l);padding:5px 14px;transition:all .4s}
+  body.p2 .tbadge{background:#e8edf5;border-color:#c5d0e0}
+  .pgwrap{margin:28px 0 40px}
+  .pgtracks{display:flex;gap:10px;align-items:flex-end}
+  .track{flex:1}
+  .tklabel{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;opacity:.45;transition:opacity .3s}
+  .tklabel.on{opacity:1}
+  .tk1 .tklabel{color:var(--clay)} .tk2 .tklabel{color:var(--blue)}
+  .tkdots{display:flex;gap:5px}
+  .ds{height:4px;border-radius:2px;flex:1;background:var(--sand-dark);transition:all .35s ease}
+  .tk1 .ds.active{background:var(--clay);flex:2} .tk1 .ds.done{background:var(--clay-l);opacity:.5}
+  .tk2 .ds.active{background:var(--blue);flex:2} .tk2 .ds.done{background:var(--blue-l);opacity:.5}
+  .tkdiv{width:1px;background:var(--bdr);height:36px;flex-shrink:0}
+  .pglabel{font-size:12px;color:var(--bark-l);font-weight:500;margin-top:10px}
+  .step{display:none}
+  .step.active{display:block;animation:rise .4s cubic-bezier(.22,.68,0,1.2) both}
+  @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+  .shead{font-family:'Fraunces',serif;font-size:20px;font-weight:400;font-style:italic;color:var(--bark);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--bdr)}
+  .req{color:var(--clay);margin-left:2px} body.p2 .req{color:var(--blue)}
+  .q{margin-bottom:30px}
+  .ql{font-size:15px;font-weight:600;color:var(--bark);margin-bottom:5px;line-height:1.5}
+  .qsub{font-size:13px;color:var(--bark-l);margin-bottom:12px;line-height:1.5}
+  .qerr{display:none;font-size:12.5px;color:var(--err);margin-top:8px;font-weight:500}
+  .q.bad .qerr{display:block}
+  .q.bad input,.q.bad textarea{border-color:var(--err)!important;background:var(--err-p)!important}
+  .q.bad .cw{outline:2px solid var(--err);outline-offset:3px;border-radius:10px}
+  input[type=text],input[type=email],textarea{width:100%;background:var(--card);border:1.5px solid var(--sand-dark);border-radius:10px;color:var(--bark);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;padding:13px 16px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+  input:focus,textarea:focus{border-color:var(--clay-l);box-shadow:0 0 0 3px rgba(196,97,58,.09)}
+  body.p2 input:focus,body.p2 textarea:focus{border-color:var(--blue-l);box-shadow:0 0 0 3px rgba(45,95,166,.1)}
+  input::placeholder,textarea::placeholder{color:var(--bark-l);opacity:.5}
+  textarea{resize:vertical;min-height:88px;line-height:1.65}
+  .choices{display:grid;gap:8px} .g2{grid-template-columns:1fr 1fr}
+  .cb{background:var(--card);border:1.5px solid var(--sand-dark);border-radius:10px;color:var(--bark-m);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:400;padding:12px 15px;text-align:left;transition:all .18s ease;display:flex;align-items:flex-start;gap:11px;line-height:1.45}
+  .cb:hover{border-color:var(--clay-l);background:var(--clay-p);color:var(--bark);transform:translateY(-1px)}
+  .cb.on{border-color:var(--clay);background:var(--clay-p);color:var(--bark);font-weight:500}
+  body.p2 .cb:hover{border-color:var(--blue-l);background:var(--blue-p)}
+  body.p2 .cb.on{border-color:var(--blue);background:var(--blue-p)}
+  body.p2 .cb.on .pd{border-color:var(--blue);background:var(--blue)}
+  body.p2 .cb.on .ps{border-color:var(--blue);background:var(--blue)}
+  .pd{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--sand-dark);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .cb.on .pd{border-color:var(--clay);background:var(--clay)}
+  .cb.on .pd::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+  .ps{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--sand-dark);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .cb.on .ps{border-color:var(--clay);background:var(--clay)}
+  .cb.on .ps::after{content:'✓';font-size:10px;color:#fff;font-weight:700}
+  .scale{display:flex;gap:8px}
+  .sb{flex:1;background:var(--card);border:1.5px solid var(--sand-dark);border-radius:8px;color:var(--bark-l);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;padding:12px 0;text-align:center;transition:all .18s}
+  .sb:hover{border-color:var(--clay-l);color:var(--bark)}
+  .sb.on{border-color:var(--clay);background:var(--clay-p);color:var(--clay)}
+  body.p2 .sb:hover{border-color:var(--blue-l)}
+  body.p2 .sb.on{border-color:var(--blue);background:var(--blue-p);color:var(--blue)}
+  .slabs{display:flex;justify-content:space-between;font-size:11.5px;color:var(--bark-l);margin-top:8px}
+  .div{height:1px;background:var(--bdr);margin:28px 0}
+  .nav{display:flex;gap:10px;justify-content:flex-end;margin-top:36px;align-items:center}
+  .btn{border:none;border-radius:10px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;padding:13px 26px;transition:all .18s}
+  .ghost{background:transparent;border:1.5px solid var(--sand-dark);color:var(--bark-l)}
+  .ghost:hover{color:var(--bark);background:var(--sand-mid)}
+  .dark{background:var(--bark);color:var(--sand)}
+  .dark:hover{background:var(--bark-m);transform:translateY(-1px)}
+  .blu{background:var(--blue);color:#fff}
+  .blu:hover{background:var(--blue-l);transform:translateY(-1px)}
+  .subm{background:var(--blue);color:#fff;padding:14px 32px;display:flex;align-items:center;gap:8px}
+  .subm:hover{background:var(--blue-l);transform:translateY(-1px)}
+  .subm:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+  .subm.loading .spin{display:block} .subm.loading .lbl{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .vbanner{display:none;background:var(--err-p);border:1px solid rgba(192,57,43,.25);border-radius:8px;padding:11px 16px;font-size:13px;color:var(--err);font-weight:500;margin-top:16px}
+  .vbanner.show{display:block}
+  .succ{text-align:center;padding:80px 20px;animation:rise .6s cubic-bezier(.22,.68,0,1.2) both}
+  .succ-c{width:60px;height:60px;border-radius:50%;background:var(--blue-p);border:1.5px solid rgba(45,95,166,.3);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 26px}
+  .succ h2{font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin-bottom:14px;color:var(--bark)}
+  .succ p{color:var(--bark-l);font-size:15px;line-height:1.75;max-width:360px;margin:0 auto}
+  .fn{font-size:12px;color:var(--bark-l);margin-top:12px;line-height:1.6;opacity:.65}
+  @media(max-width:480px){.g2{grid-template-columns:1fr}.sb{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr" id="h1">
+  <div class="pbadge"><span class="bd"></span>Part 1 of 2 · San Francisco</div>
+  <h1>How do people actually<br>meet in <em>this city?</em></h1>
+  <p class="sub">We're exploring how SF residents form new connections — what's working, what's awkward, and what's genuinely missing.</p>
+  <div class="tbadge">⏱ Under 3 minutes</div>
+</div>
+
+<div class="hdr" id="h2" style="display:none">
+  <div class="pbadge"><span class="bd"></span>Part 2 of 2 · Online</div>
+  <h1>How do you stay in touch<br>and <em>keep connected?</em></h1>
+  <p class="sub">A few questions about the apps you use daily and your experience with LinkedIn.</p>
+  <div class="tbadge">⏱ 2 more minutes</div>
+</div>
+
+<div class="pgwrap">
+  <div class="pgtracks">
+    <div class="track tk1">
+      <div class="tklabel on" id="tl1">Meeting people</div>
+      <div class="tkdots">
+        <div class="ds active" id="d1"></div>
+        <div class="ds" id="d2"></div>
+        <div class="ds" id="d3"></div>
+      </div>
+    </div>
+    <div class="tkdiv"></div>
+    <div class="track tk2">
+      <div class="tklabel" id="tl2">Online &amp; LinkedIn</div>
+      <div class="tkdots">
+        <div class="ds" id="d4"></div>
+        <div class="ds" id="d5"></div>
+        <div class="ds" id="d6"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pglabel" id="pgl">Step 1 of 6</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <div class="shead">A little about you</div>
+
+  <div class="q" id="q-name">
+    <div class="ql">Your name <span class="req">*</span></div>
+    <input type="text" id="i-name" placeholder="First and last name">
+    <div class="qerr">Please enter your name.</div>
+  </div>
+
+  <div class="q" id="q-hood">
+    <div class="ql">What neighborhood do you live in? <span class="req">*</span></div>
+    <input type="text" id="i-hood" placeholder="e.g. Mission, Hayes Valley, SoMa, North Beach...">
+    <div class="qerr">Please enter your neighborhood.</div>
+  </div>
+
+  <div class="q" id="q-tenure">
+    <div class="ql">How long have you lived in San Francisco? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="tenure" data-value="under-1" onclick="pick(this,'s')"><span class="pd"></span>Less than a year — still finding my footing</button>
+      <button class="cb" data-group="tenure" data-value="1-3" onclick="pick(this,'s')"><span class="pd"></span>1–3 years</button>
+      <button class="cb" data-group="tenure" data-value="3-7" onclick="pick(this,'s')"><span class="pd"></span>3–7 years</button>
+      <button class="cb" data-group="tenure" data-value="7-plus" onclick="pick(this,'s')"><span class="pd"></span>7+ years — basically a local</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="q" id="q-sit">
+    <div class="ql">What best describes your current situation? <span class="req">*</span></div>
+    <div class="cw"><div class="choices g2">
+      <button class="cb" data-group="sit" data-value="student" onclick="pick(this,'s')"><span class="pd"></span>Student</button>
+      <button class="cb" data-group="sit" data-value="early-career" onclick="pick(this,'s')"><span class="pd"></span>Early career</button>
+      <button class="cb" data-group="sit" data-value="mid-career" onclick="pick(this,'s')"><span class="pd"></span>Established career</button>
+      <button class="cb" data-group="sit" data-value="founder" onclick="pick(this,'s')"><span class="pd"></span>Founder / self-employed</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="vbanner" id="vb1">Please answer all required questions before continuing.</div>
+  <div class="nav"><button class="btn dark" onclick="nx(1)">Next →</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div class="shead">How you meet people now</div>
+
+  <div class="q" id="q-meet">
+    <div class="ql">How do you most often meet new people in SF? <span class="req">*</span></div>
+    <div class="qsub">Pick everything that applies.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="meet" data-value="mutuals" onclick="pick(this,'m')"><span class="ps"></span>Through mutual friends — someone introduces us</button>
+      <button class="cb" data-group="meet" data-value="work" onclick="pick(this,'m')"><span class="ps"></span>Work or coworkers</button>
+      <button class="cb" data-group="meet" data-value="prof-events" onclick="pick(this,'m')"><span class="ps"></span>Professional networking events or industry meetups</button>
+      <button class="cb" data-group="meet" data-value="pub-events" onclick="pick(this,'m')"><span class="ps"></span>Public events — concerts, markets, festivals</button>
+      <button class="cb" data-group="meet" data-value="classes" onclick="pick(this,'m')"><span class="ps"></span>Classes, clubs, or hobby groups</button>
+      <button class="cb" data-group="meet" data-value="apps" onclick="pick(this,'m')"><span class="ps"></span>Apps — Meetup, Bumble BFF, etc.</button>
+      <button class="cb" data-group="meet" data-value="organic" onclick="pick(this,'m')"><span class="ps"></span>Organically — coffee shops, parks, bars</button>
+      <button class="cb" data-group="meet" data-value="rarely" onclick="pick(this,'m')"><span class="ps"></span>Honestly, I rarely meet new people here</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="q" id="q-ease">
+    <div class="ql">Compared to other cities, how easy is it to meet people in SF? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="ease" data-value="easier" onclick="pick(this,'s')"><span class="pd"></span>Easier — SF has been great for meeting people</button>
+      <button class="cb" data-group="ease" data-value="same" onclick="pick(this,'s')"><span class="pd"></span>About the same as anywhere</button>
+      <button class="cb" data-group="ease" data-value="harder" onclick="pick(this,'s')"><span class="pd"></span>Harder — SF is surprisingly difficult</button>
+      <button class="cb" data-group="ease" data-value="only-city" onclick="pick(this,'s')"><span class="pd"></span>SF is the only city I've really known</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="q" id="q-friction">
+    <div class="ql">What makes it hard to meet new people here? <span class="req">*</span></div>
+    <div class="qsub">Pick all that resonate.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="friction" data-value="busy" onclick="pick(this,'m')"><span class="ps"></span>Everyone's too busy — hard to get time on calendars</button>
+      <button class="cb" data-group="friction" data-value="transient" onclick="pick(this,'m')"><span class="ps"></span>People move in and out of the city constantly</button>
+      <button class="cb" data-group="friction" data-value="cliques" onclick="pick(this,'m')"><span class="ps"></span>Social circles feel closed off — hard to break in</button>
+      <button class="cb" data-group="friction" data-value="forced" onclick="pick(this,'m')"><span class="ps"></span>Organized events feel forced or awkward</button>
+      <button class="cb" data-group="friction" data-value="no-venue" onclick="pick(this,'m')"><span class="ps"></span>No obvious place or context to just... talk to strangers</button>
+      <button class="cb" data-group="friction" data-value="shallow" onclick="pick(this,'m')"><span class="ps"></span>Interactions stay shallow — hard to go deeper</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="vbanner" id="vb2">Please answer all required questions before continuing.</div>
+  <div class="nav">
+    <button class="btn ghost" onclick="pv(2)">← Back</button>
+    <button class="btn dark" onclick="nx(2)">Next →</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step-3">
+  <div class="shead">What you'd actually want</div>
+
+  <div class="q" id="q-format">
+    <div class="ql">Which sounds most appealing as a way to meet new people? <span class="req">*</span></div>
+    <div class="qsub">Pick your top one or two.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="format" data-value="coffee-popup" onclick="pick(this,'m')"><span class="ps"></span>A casual drop-in coffee pop-up — specifically for meeting and chatting with new people nearby</button>
+      <button class="cb" data-group="format" data-value="small-dinner" onclick="pick(this,'m')"><span class="ps"></span>Small group dinners with strangers who share similar interests</button>
+      <button class="cb" data-group="format" data-value="interest-events" onclick="pick(this,'m')"><span class="ps"></span>Interest-based meetups — around a topic, not just networking</button>
+      <button class="cb" data-group="format" data-value="speed-meet" onclick="pick(this,'m')"><span class="ps"></span>Structured speed-meeting (like speed dating, but for new connections)</button>
+      <button class="cb" data-group="format" data-value="neighborhood" onclick="pick(this,'m')"><span class="ps"></span>Neighborhood-specific hangouts — meet people who live nearby</button>
+      <button class="cb" data-group="format" data-value="app-first" onclick="pick(this,'m')"><span class="ps"></span>Connect on an app first, then meet in person</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="q" id="q-popup">
+    <div class="ql">If a coffee pop-up for meeting new people existed in your neighborhood, how likely are you to go? <span class="req">*</span></div>
+    <div class="scale" id="sc-popup">
+      <button class="sb" onclick="psc(this,'popup',1)">1</button>
+      <button class="sb" onclick="psc(this,'popup',2)">2</button>
+      <button class="sb" onclick="psc(this,'popup',3)">3</button>
+      <button class="sb" onclick="psc(this,'popup',4)">4</button>
+      <button class="sb" onclick="psc(this,'popup',5)">5</button>
+    </div>
+    <div class="slabs"><span>Would never go</span><span>Would definitely go</span></div>
+    <div class="qerr">Please select a rating.</div>
+  </div>
+
+  <div class="q" id="q-timing">
+    <div class="ql">What time slot would work best? <span class="req">*</span></div>
+    <div class="cw"><div class="choices g2">
+      <button class="cb" data-group="timing" data-value="wk-morning" onclick="pick(this,'s')"><span class="pd"></span>Weekday morning (7–9am)</button>
+      <button class="cb" data-group="timing" data-value="wk-lunch" onclick="pick(this,'s')"><span class="pd"></span>Weekday lunch (12–2pm)</button>
+      <button class="cb" data-group="timing" data-value="wk-eve" onclick="pick(this,'s')"><span class="pd"></span>Weekday after work (6–8pm)</button>
+      <button class="cb" data-group="timing" data-value="we-morning" onclick="pick(this,'s')"><span class="pd"></span>Weekend morning (9–11am)</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="vbanner" id="vb3">Please answer all required questions before continuing.</div>
+  <div class="nav">
+    <button class="btn ghost" onclick="pv(3)">← Back</button>
+    <button class="btn dark" onclick="top2()">Next →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step-4">
+  <div class="shead">How you stay up-to-date online</div>
+
+  <div class="q" id="q-apps">
+    <div class="ql">Which of these do you use regularly? <span class="req">*</span></div>
+    <div class="qsub">Pick all that apply.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="apps" data-value="twitter" onclick="pick(this,'m')"><span class="ps"></span>X / Twitter</button>
+      <button class="cb" data-group="apps" data-value="reddit" onclick="pick(this,'m')"><span class="ps"></span>Reddit</button>
+      <button class="cb" data-group="apps" data-value="linkedin" onclick="pick(this,'m')"><span class="ps"></span>LinkedIn</button>
+      <button class="cb" data-group="apps" data-value="none" onclick="pick(this,'m')"><span class="ps"></span>None of these</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="q" id="q-freq">
+    <div class="ql">How often do you check these apps throughout the day? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="freq" data-value="always" onclick="pick(this,'s')"><span class="pd"></span>Constantly — they're always open</button>
+      <button class="cb" data-group="freq" data-value="few-times" onclick="pick(this,'s')"><span class="pd"></span>A few times a day</button>
+      <button class="cb" data-group="freq" data-value="once" onclick="pick(this,'s')"><span class="pd"></span>Once a day or less</button>
+      <button class="cb" data-group="freq" data-value="rarely" onclick="pick(this,'s')"><span class="pd"></span>Rarely — not much of a social media person</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="q" id="q-purpose">
+    <div class="ql">What do you mainly use those platforms for? <span class="req">*</span></div>
+    <div class="qsub">Pick all that apply.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="purpose" data-value="news" onclick="pick(this,'m')"><span class="ps"></span>Real-time news and what's happening right now</button>
+      <button class="cb" data-group="purpose" data-value="follow" onclick="pick(this,'m')"><span class="ps"></span>Following specific people whose thoughts I find interesting</button>
+      <button class="cb" data-group="purpose" data-value="communities" onclick="pick(this,'m')"><span class="ps"></span>Participating in communities around shared topics</button>
+      <button class="cb" data-group="purpose" data-value="local" onclick="pick(this,'m')"><span class="ps"></span>Keeping up with what's going on locally in SF</button>
+      <button class="cb" data-group="purpose" data-value="posting" onclick="pick(this,'m')"><span class="ps"></span>Posting my own updates and thoughts</button>
+      <button class="cb" data-group="purpose" data-value="dms" onclick="pick(this,'m')"><span class="ps"></span>Direct messaging people I know</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="vbanner" id="vb4">Please answer all required questions before continuing.</div>
+  <div class="nav">
+    <button class="btn ghost" onclick="pv(4)">← Back</button>
+    <button class="btn blu" onclick="nx(4)">Next →</button>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="step-5">
+  <div class="shead">Your experience with LinkedIn</div>
+
+  <div class="q" id="q-lifreq">
+    <div class="ql">How often do you actively use LinkedIn? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="lifreq" data-value="daily" onclick="pick(this,'s')"><span class="pd"></span>Daily</button>
+      <button class="cb" data-group="lifreq" data-value="few-week" onclick="pick(this,'s')"><span class="pd"></span>A few times a week</button>
+      <button class="cb" data-group="lifreq" data-value="job-hunt" onclick="pick(this,'s')"><span class="pd"></span>Only when job hunting</button>
+      <button class="cb" data-group="lifreq" data-value="rarely" onclick="pick(this,'s')"><span class="pd"></span>Rarely — I have an account but barely open it</button>
+      <button class="cb" data-group="lifreq" data-value="never" onclick="pick(this,'s')"><span class="pd"></span>Never / don't have an account</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="q" id="q-lifrust">
+    <div class="ql">What frustrates you most about LinkedIn? <span class="req">*</span></div>
+    <div class="qsub">Pick all that apply.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="lifrust" data-value="spam" onclick="pick(this,'m')"><span class="ps"></span>Constant sales and recruiter spam in messages</button>
+      <button class="cb" data-group="lifrust" data-value="fake" onclick="pick(this,'m')"><span class="ps"></span>Fake or exaggerated profiles — hard to know who's real</button>
+      <button class="cb" data-group="lifrust" data-value="job-board" onclick="pick(this,'m')"><span class="ps"></span>Feels like a job board, not an actual network</button>
+      <button class="cb" data-group="lifrust" data-value="cringe" onclick="pick(this,'m')"><span class="ps"></span>Performative, cringe-worthy posts dominate the feed</button>
+      <button class="cb" data-group="lifrust" data-value="no-convos" onclick="pick(this,'m')"><span class="ps"></span>Connections don't lead to real conversations</button>
+      <button class="cb" data-group="lifrust" data-value="irrelevant" onclick="pick(this,'m')"><span class="ps"></span>The feed is irrelevant — I don't care what gets shown</button>
+      <button class="cb" data-group="lifrust" data-value="not-for-me" onclick="pick(this,'m')"><span class="ps"></span>Feels built for senior professionals and recruiters, not me</button>
+      <button class="cb" data-group="lifrust" data-value="cold-weird" onclick="pick(this,'m')"><span class="ps"></span>Messaging someone cold feels weird and transactional</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="q" id="q-liafter">
+    <div class="ql">After connecting with someone on LinkedIn, what usually happens? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="liafter" data-value="nothing" onclick="pick(this,'s')"><span class="pd"></span>Nothing — the connection just sits there</button>
+      <button class="cb" data-group="liafter" data-value="likes" onclick="pick(this,'s')"><span class="pd"></span>I occasionally see their posts and like them</button>
+      <button class="cb" data-group="liafter" data-value="msg" onclick="pick(this,'s')"><span class="pd"></span>We sometimes message each other</button>
+      <button class="cb" data-group="liafter" data-value="real" onclick="pick(this,'s')"><span class="pd"></span>It's led to a real ongoing relationship or opportunity</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="q" id="q-liirl">
+    <div class="ql">Have you ever met someone in person specifically because of LinkedIn? <span class="req">*</span></div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="liirl" data-value="yes-often" onclick="pick(this,'s')"><span class="pd"></span>Yes, more than once</button>
+      <button class="cb" data-group="liirl" data-value="yes-once" onclick="pick(this,'s')"><span class="pd"></span>Yes, once or twice</button>
+      <button class="cb" data-group="liirl" data-value="no" onclick="pick(this,'s')"><span class="pd"></span>No — it's never translated to anything in-person</button>
+    </div></div>
+    <div class="qerr">Please select an option.</div>
+  </div>
+
+  <div class="vbanner" id="vb5">Please answer all required questions before continuing.</div>
+  <div class="nav">
+    <button class="btn ghost" onclick="pv(5)">← Back</button>
+    <button class="btn blu" onclick="nx(5)">Next →</button>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="step-6">
+  <div class="shead">Last few things</div>
+
+  <div class="q" id="q-stay">
+    <div class="ql">After meeting someone new in SF, how do you usually stay in touch? <span class="req">*</span></div>
+    <div class="qsub">Pick all that apply.</div>
+    <div class="cw"><div class="choices">
+      <button class="cb" data-group="stay" data-value="linkedin" onclick="pick(this,'m')"><span class="ps"></span>LinkedIn connection</button>
+      <button class="cb" data-group="stay" data-value="twitter" onclick="pick(this,'m')"><span class="ps"></span>Follow them on X / Twitter</button>
+      <button class="cb" data-group="stay" data-value="text" onclick="pick(this,'m')"><span class="ps"></span>Phone number / iMessage</button>
+      <button class="cb" data-group="stay" data-value="group-chat" onclick="pick(this,'m')"><span class="ps"></span>Add them to a group chat</button>
+      <button class="cb" data-group="stay" data-value="lose-touch" onclick="pick(this,'m')"><span class="ps"></span>Honestly, I usually lose touch</button>
+    </div></div>
+    <div class="qerr">Please select at least one option.</div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="q" id="q-email">
+    <div class="ql">Your email <span class="req">*</span></div>
+    <input type="email" id="i-email" placeholder="you@email.com">
+    <p class="fn" style="margin-top:8px">We'll only reach out if we're organizing something in SF. No newsletters, no spam.</p>
+    <div class="qerr">Please enter a valid email address.</div>
+  </div>
+
+  <div class="vbanner" id="vb6">Please answer all required questions before submitting.</div>
+  <div class="nav">
+    <button class="btn ghost" onclick="pv(6)">← Back</button>
+    <button class="btn subm" id="sbtn" onclick="doSub()">
+      <span class="lbl">Submit →</span>
+      <div class="spin"></div>
+    </button>
+  </div>
+</div>
+
+<!-- Success -->
+<div class="step" id="step-ok">
+  <div class="succ">
+    <div class="succ-c">✓</div>
+    <h2>Thanks for your time.</h2>
+    <p>Your responses have been saved to our database. We're working on something for SF — and you'll hear from us when it's ready.</p>
+  </div>
+</div>
+
+</div>
+<script>
+var step=1, SC={};
+
+var RULES={
+  1:[{id:'q-name',t:'txt',f:'i-name'},{id:'q-hood',t:'txt',f:'i-hood'},{id:'q-tenure',t:'s',g:'tenure'},{id:'q-sit',t:'s',g:'sit'}],
+  2:[{id:'q-meet',t:'m',g:'meet'},{id:'q-ease',t:'s',g:'ease'},{id:'q-friction',t:'m',g:'friction'}],
+  3:[{id:'q-format',t:'m',g:'format'},{id:'q-popup',t:'sc',k:'popup'},{id:'q-timing',t:'s',g:'timing'}],
+  4:[{id:'q-apps',t:'m',g:'apps'},{id:'q-freq',t:'s',g:'freq'},{id:'q-purpose',t:'m',g:'purpose'}],
+  5:[{id:'q-lifreq',t:'s',g:'lifreq'},{id:'q-lifrust',t:'m',g:'lifrust'},{id:'q-liafter',t:'s',g:'liafter'},{id:'q-liirl',t:'s',g:'liirl'}],
+  6:[{id:'q-stay',t:'m',g:'stay'},{id:'q-email',t:'email',f:'i-email'}]
+};
+
+function val(s){
+  var ok=true,rs=RULES[s]||[];
+  for(var i=0;i<rs.length;i++){
+    var r=rs[i],q=document.getElementById(r.id),pass=false;
+    if(r.t==='txt') pass=document.getElementById(r.f).value.trim().length>0;
+    else if(r.t==='email'){var v=document.getElementById(r.f).value.trim();pass=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+    else if(r.t==='s'||r.t==='m') pass=document.querySelectorAll('[data-group="'+r.g+'"].on').length>0;
+    else if(r.t==='sc') pass=!!SC[r.k];
+    q.classList.toggle('bad',!pass);
+    if(!pass)ok=false;
+  }
+  var b=document.getElementById('vb'+s);
+  if(b)b.classList.toggle('show',!ok);
+  return ok;
+}
+
+function show(n){
+  document.querySelectorAll('.step').forEach(function(e){e.classList.remove('active')});
+  var e=document.getElementById('step-'+n);
+  if(e){e.classList.add('active');e.style.animation='none';e.offsetHeight;e.style.animation='';}
+  window.scrollTo(0,0);
+}
+
+function upPg(){
+  var labs=['Step 1 of 6','Step 2 of 6','Step 3 of 6','Step 4 of 6','Step 5 of 6','Step 6 of 6'];
+  document.getElementById('pgl').textContent=labs[step-1]||'';
+  for(var i=1;i<=6;i++){
+    var d=document.getElementById('d'+i);
+    if(!d)continue;
+    d.className='ds';
+    if(i===step)d.classList.add('active');
+    else if(i<step)d.classList.add('done');
+  }
+  document.getElementById('tl1').className='tklabel'+(step<=3?' on':'');
+  document.getElementById('tl2').className='tklabel'+(step>=4?' on':'');
+}
+
+function nx(s){if(!val(s))return;step=s+1;show(step);upPg();}
+function pv(s){
+  if(s===4){document.getElementById('h1').style.display='';document.getElementById('h2').style.display='none';document.body.classList.remove('p2');}
+  step=s-1;show(step);upPg();
+}
+function top2(){
+  if(!val(3))return;
+  step=4;
+  document.getElementById('h1').style.display='none';
+  document.getElementById('h2').style.display='';
+  document.body.classList.add('p2');
+  show(4);upPg();
+}
+
+function pick(btn,mode){
+  var g=btn.getAttribute('data-group');
+  if(mode==='s')document.querySelectorAll('[data-group="'+g+'"]').forEach(function(b){b.classList.remove('on')});
+  btn.classList.toggle('on');
+  var q=btn.closest('.q');if(q)q.classList.remove('bad');
+}
+
+function psc(btn,k,v){
+  SC[k]=v;
+  document.getElementById('sc-'+k).querySelectorAll('.sb').forEach(function(b,i){b.classList.toggle('on',i<v)});
+  var q=btn.closest('.q');if(q)q.classList.remove('bad');
+}
+
+function gm(g){var o=[];document.querySelectorAll('[data-group="'+g+'"].on').forEach(function(b){o.push(b.getAttribute('data-value'))});return o;}
+function gs(g){var v=gm(g);return v.length?v[0]:null;}
+
+// Value label maps — matches what we sent to Notion
+var LM={
+  sit:     {'student':'Student','early-career':'Early career','mid-career':'Established career','founder':'Founder / self-employed'},
+  tenure:  {'under-1':'Under 1 year','1-3':'1-3 years','3-7':'3-7 years','7-plus':'7+ years'},
+  meet:    {'mutuals':'Mutual friends','work':'Work / coworkers','prof-events':'Professional events','pub-events':'Public events','classes':'Classes / hobbies','apps':'Apps','organic':'Organically','rarely':'Rarely meets people'},
+  ease:    {'easier':'Easier','same':'About the same','harder':'Harder','only-city':'Only city I know'},
+  friction:{'busy':'Too busy','transient':'Transient population','cliques':'Closed social circles','forced':'Events feel forced','no-venue':'No obvious venue','shallow':'Interactions stay shallow'},
+  format:  {'coffee-popup':'Coffee pop-up','small-dinner':'Small group dinner','interest-events':'Interest-based meetup','speed-meet':'Speed-meeting','neighborhood':'Neighborhood hangout','app-first':'App-first'},
+  timing:  {'wk-morning':'Weekday morning','wk-lunch':'Weekday lunch','wk-eve':'Weekday evening','we-morning':'Weekend morning'},
+  apps:    {'twitter':'X / Twitter','reddit':'Reddit','linkedin':'LinkedIn','none':'None of these'},
+  freq:    {'always':'Constantly','few-times':'Few times a day','once':'Once daily','rarely':'Rarely'},
+  purpose: {'news':'Real-time news','follow':'Following people','communities':'Communities','local':'Local SF','posting':'Posting updates','dms':'Direct messaging'},
+  lifreq:  {'daily':'Daily','few-week':'Few times a week','job-hunt':'Only job hunting','rarely':'Rarely','never':'Never'},
+  lifrust: {'spam':'Spam / recruiters','fake':'Fake profiles','job-board':'Feels like job board','cringe':'Cringe content','no-convos':'No real conversations','irrelevant':'Irrelevant feed','not-for-me':'Not built for me','cold-weird':'Cold messaging is awkward'},
+  liafter: {'nothing':'Nothing happens','likes':'Occasional likes','msg':'Sometimes message','real':'Real relationship'},
+  liirl:   {'yes-often':'Yes often','yes-once':'Yes once or twice','no':'No'},
+  stay:    {'linkedin':'LinkedIn','twitter':'X / Twitter','text':'iMessage / text','group-chat':'Group chat','lose-touch':'Usually lose touch'},
+};
+
+function mapS(g,v){return v?(LM[g]||{})[v]||v:null;}
+function mapM(g,a){return(a||[]).map(function(v){return(LM[g]||{})[v]||v;}).filter(Boolean);}
+
+async function doSub(){
+  if(!val(6))return;
+  var btn=document.getElementById('sbtn');
+  btn.classList.add('loading');btn.disabled=true;
+  var payload={
+    name:document.getElementById('i-name').value.trim(),
+    email:document.getElementById('i-email').value.trim(),
+    neighborhood:document.getElementById('i-hood').value.trim(),
+    tenure_in_sf:mapS('tenure',gs('tenure')),
+    current_situation:mapS('sit',gs('sit')),
+    how_meet_people:mapM('meet',gm('meet')),
+    ease_vs_other_cities:mapS('ease',gs('ease')),
+    friction_points:mapM('friction',gm('friction')),
+    preferred_formats:mapM('format',gm('format')),
+    popup_likelihood:SC['popup']||null,
+    preferred_timing:mapS('timing',gs('timing')),
+    apps_used:mapM('apps',gm('apps')),
+    check_frequency:mapS('freq',gs('freq')),
+    app_purpose:mapM('purpose',gm('purpose')),
+    linkedin_frequency:mapS('lifreq',gs('lifreq')),
+    linkedin_frustrations:mapM('lifrust',gm('lifrust')),
+    linkedin_after_connect:mapS('liafter',gs('liafter')),
+    linkedin_led_to_irl:mapS('liirl',gs('liirl')),
+    stay_in_touch_via:mapM('stay',gm('stay')),
+  };
+  try{
+    var r=await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error(await r.text());
+    document.querySelectorAll('.step').forEach(function(e){e.classList.remove('active')});
+    document.getElementById('step-ok').classList.add('active');
+    document.querySelectorAll('.ds').forEach(function(d){d.className='ds done'});
+    document.getElementById('pgl').textContent='Complete ✓';
+    window.scrollTo(0,0);
+  }catch(e){
+    console.error(e);btn.classList.remove('loading');btn.disabled=false;
+    alert('Something went wrong — please try again.');
+  }
+}
+upPg();
+</script>
+</body>
+</html>
