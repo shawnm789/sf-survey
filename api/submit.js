@@ -8,7 +8,7 @@
 //   4. In Vercel: Settings → Environment Variables → add NOTION_TOKEN = your token
 //   5. Deploy — done.
 
-const NOTION_DB_ID = 'eb8a1ac37ca54f1b9c36c116ae42060c';
+const NOTION_DB_ID = '8c09b844448a4fae9f46b0c280929215';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
