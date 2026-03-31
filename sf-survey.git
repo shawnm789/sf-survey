@@ -1,5 +1,5 @@
 git init
 git add .
 git commit -m "SF survey"
-git remote add origin https://github.com/YOUR_USERNAME/sf-survey.git
+git remote add origin https://github.com/shawnm789/sf-survey.git
 git push -u origin main
